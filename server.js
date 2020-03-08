@@ -1,50 +1,25 @@
-// Global Variables
+// Global Librarys we are Calling
 //================================
 const express = require("express");
 const path = require("path");
 var http = require("http");
-var fs = require("fs");
+// var fs = require("fs");
+const apiRoutes = require("./apiRoutes");
+const htmlRoutes = require("./htmlRoutes");
+
 
 // Create Server
 //==============================
-var PORT = 3060;
-var server = http.createServer(handleRequest);
-function handleRequest(req, res) {
-  var path = req.url;
-}
+var app = express();
+var PORT = process.env.PORT || 3060;
 
 // sets up the express app 
 //===============================
-var app = express();
-var port = process.env.PORT || 3060;
-
-// sets up Express App to Handle Data Parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-//Data
-//=========================
-
-//=========================
-
-//Routes
-//=========================
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "./public/index.html"));
-  });
-
-app.get("/notes", (req, res) => {
-    res.sendFile(path.join(__dirname, "./public/notes.html"));
-    });
-
-app.get("/notes", (req, res) => {
-    res.sendFile(path.join(__dirname, "./public/notes.html"));
-    });   
-
-app.post("/db.json"), (req, res) => {
-    res.send("/api/notes")
-}
-
+//app.use(express.static("public"));// says that the static folder where 
+app.use("/api", apiRoutes); // so this tells the server sees /api it will know to use API routes
+app.use("/", htmlRoutes);
 
 // Listener
 // ===========================================================
