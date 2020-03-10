@@ -17,7 +17,7 @@ var PORT = process.env.PORT || 3060;
 //===============================
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-//app.use(express.static("public"));// says that the static folder where 
+app.use(express.static("Develop"));// says that the static folder where 
 app.use("/api", apiRoutes); // so this tells the server sees /api it will know to use API routes
 app.use("/", htmlRoutes);
 
