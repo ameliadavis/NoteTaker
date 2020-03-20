@@ -1,65 +1,101 @@
 const router = require("express").Router();
 const fs = require("fs");
-// const index = require("index.js")
-// const dbJson = require("db.json")
+const HTTP = require("http");
+const util = require("util");
+const notesArray = []
+const readFileAsync = util.promisify(fs.readFile);
+const writeFileAsync = util.promisify(fs.writeFile);
+
 
 // API routes (what to do when actions happen)
 router.get("/notes", (req, res) => {
-    readNotes(req.body);// read current notes, parse and display 
-    // console.log("response in get route" + res);
-    // return res.send();
+    //readNotes().then(data => res.json(console.log(data)))
+    readNotes().then((notes) => {res.json(JSON.parse(notes))})
+    .catch(err => res.status(500).json(err));//filter function);
     });
 
 router.post("/notes", (req, res) => {
-    writetoAPI(req);
+    console.log("in post router");
+    writetoAPI(req,res);
+    //writetoAPI().then(notes => res.json(JSON.parse(notes)))
+    //.catch(err => console.log(err));;
 });
 //"/api/notes"
 
 router.delete('/notes/:id', function (req, res) {
-    deleteNote();
+    deleteNote().then() ;
 })
 
+//================================================
 // Functions Logic _ Where we actually tell it what to do
 //================================================
-
+function readNotes(req,res){
+    console.log("inReadNote");
+        return readFileAsync("./Develop/db/db.json", "utf8"); 
+}
 //write api to json  
-function writetoAPI (note){
-    var test = JSON.parse(note)
-    console.log("write to API file" + test); // since we are passing the whole body HTML
-    infoToWrite = JSON.parse(test);
-    fs.writeFile("Develop/db/db.json", test, (err)=>{ //read JSON, parse JSON into an array, append the array, then stringify the array then write to the file 
-     if(err) throw err; 
-     
-     })
-     // need a post here 
+//function writetoAPI(){
+function writetoAPI (req, res){
+    console.log("in WritetoAPI");
+    readFileAsync("./Develop/db/db.json","utf8")
+    // .then((file) => {res.json(JSON.parse(file))})
+    .then((file) => {let parsedFile;
+        try{ console.log("write file: " + file)
+            var newNote = "title: " + req.body.title + "text: "+ req.body.text;
+            //var newNoteTitle = {};
+            // var newNoteText = {}
+            // var newArray = [];
+            newNoteTitle = req.body.title
+            newNoteText = req.body.text
+            console.log(newNoteTitle + " " + newNoteText);
+            // newArray.push(newNoteTitle,newNoteText);
+            //console.log("newArray" + newArray);
+            //var newNote = req.json(JSON.parse(req.body))
+            var newNote = { title: newNoteTitle, text: newNoteText}
+            //var newNote = {id: lastNote++, "'title: '" + req.body.title, "'text: '"req.body.text}
+            console.log("New Note " + newNote);
+            //lastNote = file.length + 1 || 1;
+            //console.log("last note"  + lastNote);
+            var testArray = [...file,newNote];
+            console.log(testArray);
+            file.push(newNote);
+            console.log ("new File "+ file);
+             fs.writeFile("./Develop/db/db.json","utf8", JSON.stringify(file)).then(
+                 function(){
+                    console.log("success - file written")
+                     res.json(req.body);
+                 }
+              )
+        } catch(err) { parsedFile= [];
+            //throw err
+        } 
+      // need a post here 
+    });
  };
- 
- function readNotes(data){
-   console.log("inReadNote");
-   fs.readFile("./Develop/db/db.json", (err, data)=> {
-       if (err) throw err;
-       let readMe = JSON.parse(data);
-       console.log(readMe);
-       // how the hell do I send it to the html to display? 
-        // return JSON.stringify(readMe);
-        //return readMe;
-        //send to getnotes function in index.js
-   });
-  
- }
+//}
+
+//  async function readNotes(req,res){
+//    console.log("inReadNote");
+//    let file = await fs.readFile("./Develop/db/db.json", "utf8", (err) => {
+//        req.json(JSON.parse(file))
+//        console.log("Got file: " + file)
+//    });
+//  }
+
  
  function deleteNote (req,res){ 
      console.log(req);
-    // const originalArray = JSON.parse(dbJson)
-    //     console.log(originalArray);
-    //     console.log(req.params.id)
-    // for (var i = 0; i < originalArray.length; i++){
-    //     if(req.params.id === originalArray.id){
-    //        console.log("ID selected to delete");
-    //     } else{
-    //        console.log(res);
-    //     }
-    // }
+    const originalArray = JSON.parse(dbJson)
+        console.log(originalArray);
+        console.log(req.params.id)
+        for (var i = 0; i < originalArray.length; i++){
+            if(req.params.id === originalArray.id){
+            console.log("ID selected to delete");
+            originalArray.filter()
+            } else{
+            console.log(res);
+            }
+        }
      // req.params.id Will be passed into this function to make it work
      // parse the json array and then loop through by the ID and remove that ID then restringify and write the file
    
