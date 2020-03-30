@@ -2,6 +2,8 @@ const router = require("express").Router();
 const fs = require("fs");
 const HTTP = require("http");
 const util = require("util");
+// const uuidv1 = require('uuid/v1')
+var uuidv1 = require('uuidv1')
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 let count = 0;
@@ -19,7 +21,6 @@ router.post("/notes", (req, res) => {
 });
 //"/api/notes"
 router.delete('/notes/:id', function (req, res) {
-    //deleteNote(req).then() ;
     deleteNote(req)
     .then((notes) => {res.json(notes)})
     .catch(err => res.status(500).json(err));
@@ -44,46 +45,50 @@ function readNotes() {
 //function writetoAPI(){
 function writetoAPI (enteredNote){
     const { title, text } = enteredNote;
-    count++;
-    const newNotesObj = { id: count, title, text };
+    // var count = 0
+    // readNotes().then(function(value){
+    //   console.log("Value" + value)
+    //   count = value.length
+    // })
+    // // console.log("readNotes array "+ totalNotes)
+    // count++;
+    // console.log("count"+ count);
+    const newNotesObj = { id: uuidv1(), title, text };
     return readNotes()
+    // .then(count= notes.length, console.log("count length"+ count))
     .then(notes => [...notes, newNotesObj])
     .then(file => writeFileAsync("./Develop/db/db.json", JSON.stringify(file))
     .then(() => newNotesObj)
     //.then(readNotes())
     )};
- 
+
+
  function deleteNote (req,res){ 
+        var filteredNotes = []
         console.log("Inside delete Note function")
         console.log(req.params.id);
         let requestId = parseInt(req.params.id)
-        // readNotes()
-        //all this should go after readNotes... 
-        //.then(randomVariable => randomVariable.filter(newRandomVariable => newRandomVariable.id !== req.params.id)) 
-        //.then(file => writeFileAsync("./Develop/db/db.json", JSON.stringify(file))// this should go anythere after read
-      readNotes(requestId).then(function(value){
-      var filteredNotes = []
+      readNotes().then(function(value){
       for(var i = 0; i < value.length; i++){
-        console.log("Value at i")
-        console.log(value[i]);
-        console.log(value[i].id);
-        console.log("requestID")
-        console.log(requestId)
-        //console.log("req.params.id here")
-        //console.log(req.params.id)
+            console.log("Value at i")
+            console.log(value[i]);
+            console.log(value[i].id);
+            console.log("requestID")
+            console.log(requestId)
           if(parseInt(value[i].id) !== requestId){
             filteredNotes.push(value[i]);
           }
       }
       console.log("filtered Notes")
-      console.log(filteredNotes)})
-    // on this line note => is the same as a for loop or foreach
-    .then(filteredNotes => writeFileAsync("./Develop/db/db.json", JSON.stringify(filteredNotes)),
-    console.log("Filtered Notes after Delete" + filteredNotes)
+      console.log(filteredNotes)
+        writeFileAsync("./Develop/db/db.json", JSON.stringify(filteredNotes))
+        console.log("Filtered Notes in the write file")
+        console.log(filteredNotes); 
+    })
+    // console.log("Filtered Notes after Delete " + JSON.stringify(filteredNotes)))
     .then(() => filteredNotes)
-    //.then(readNotes())
-    //.then(() => notes)
-    )};
+    //  )}
+     };
     
 console.log("InAPI routes");
 module.exports = router;
