@@ -11,7 +11,7 @@ const htmlRoutes = require("./htmlRoutes");
 // Create Server
 //==============================
 var app = express();
-var PORT = process.env.PORT || 3060;
+// var PORT = process.env.PORT || 3060;
 
 // sets up the express app 
 //===============================
